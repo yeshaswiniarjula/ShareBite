@@ -103,4 +103,24 @@ The ABAP development elements saved directly from the Eclipse ADT workspace:
 * **Orders Table (`ZORDERS`) Structure**:
 ![Orders Table](screenshots/13_Table_Orders.png)
 
+* **Orders Table (`ZORDERS`) Data Select**:
+![Orders Table Data](screenshots/13_Table_Orders_Data.png)
+
+* **Order Items Table (`ZORDER_ITEMS`) Structure**:
+![Order Items Table](screenshots/13_Table_OrderItems.png)
+
+* **Order Items Table (`ZORDER_ITEMS`) Data Select**:
+![Order Items Table Data](screenshots/13_Table_OrderItems_Data.png)
+
+---
+
+## 🖥️ Frontend Web Client Screenshots
+
+### 1. Login Page
+![Login Page](screenshots/14_Login_Page.png)
+
+### 2. Register/Create Account Page
+![Register Page](screenshots/14_Register_Page.png)
+
+
 
