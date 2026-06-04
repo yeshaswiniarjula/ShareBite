@@ -87,7 +87,20 @@ The ABAP development elements saved directly from the Eclipse ADT workspace:
 ### 4. Service Bindings
 ![Service Binding](screenshots/07_Service_Binding.png)
 
-### 5. Dictionary Tables
+### 5. Dictionary Tables & Data
 * **Customers Table (`ZCUSTOMERSS`) Structure**:
 ![Customers Table](screenshots/11_Table_Customers.png)
+
+* **Customers Table (`ZCUSTOMERSS`) Data Select**:
+![Customers Table Data](screenshots/11_Table_Customers_Data.png)
+
+* **Food Menu Table (`ZFOOD_MENU`) Structure**:
+![Food Menu Table](screenshots/12_Table_FoodMenu.png)
+
+* **Food Menu Table (`ZFOOD_MENU`) Data Select**:
+![Food Menu Table Data](screenshots/12_Table_FoodMenu_Data.png)
+
+* **Orders Table (`ZORDERS`) Structure**:
+![Orders Table](screenshots/13_Table_Orders.png)
+
 
