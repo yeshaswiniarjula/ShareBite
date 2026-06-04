@@ -122,5 +122,21 @@ The ABAP development elements saved directly from the Eclipse ADT workspace:
 ### 2. Register/Create Account Page
 ![Register Page](screenshots/14_Register_Page.png)
 
+### 3. Dashboard Analytical Overview
+![Dashboard Overview](screenshots/15_Dashboard_Overview.png)
+
+### 4. Dashboard Charts & Recent Orders
+![Dashboard Charts](screenshots/15_Dashboard_Charts.png)
+
+### 5. Food Menu Registry
+![Food Menu Registry](screenshots/16_Food_Menu.png)
+
+### 6. Customer Management
+![Customer Management](screenshots/17_Customer_Management.png)
+
+### 7. Customer Export (CSV Downloaded)
+![Customer Export](screenshots/17_Customer_Export.png)
+
+
 
 
