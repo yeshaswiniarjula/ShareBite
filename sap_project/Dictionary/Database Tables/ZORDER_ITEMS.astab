@@ -1,0 +1,23 @@
+@EndUserText.label : 'order items list'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table zorder_items {
+
+  key mandt    : mandt not null;
+  @AbapCatalog.foreignKey.label : 'foreign key from orders table'
+  @AbapCatalog.foreignKey.screenCheck : true
+  key order_id : zde_orderid not null
+    with foreign key zorders
+      where mandt = zorder_items.mandt
+        and order_id = zorder_items.order_id;
+  @AbapCatalog.foreignKey.label : 'foreign key from food menu'
+  @AbapCatalog.foreignKey.screenCheck : true
+  key food_id  : zde_foodid not null
+    with foreign key zfood_menu
+      where mandt = zorder_items.mandt
+        and food_id = zorder_items.food_id;
+  quantity     : zde_quantity;
+
+}

@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareBite - SAP Fiori Food Order Management Portal</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles/style.css">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ChartJS for Stunning Interactive Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- ==========================================
+         0. FULLSCREEN SPINNER LOADER (Task 9)
+         ========================================== -->
+    <div id="spinnerLoader" class="spinner-loader">
+        <div class="spinner-icon"></div>
+        <p style="color: #ffffff; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px;"><i class="fa-solid fa-server"></i> Conceptualizing SAP RAP OData Sync...</p>
+    </div>
+
+    <!-- ==========================================
+         1. LOGIN & REGISTER PAGE VIEW
+         ========================================== -->
+    <div id="loginView" class="login-view-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>ShareBite</h1>
+                <p>Food Order Management System</p>
+                <div style="background-color: var(--fiori-primary-light); color: var(--fiori-primary); padding: 0.5rem 1rem; border-radius: var(--fiori-radius); font-size: 0.8rem; margin-bottom: 1.5rem; border: 1px solid rgba(10, 110, 209, 0.2)">
+                    <i class="fa-solid fa-circle-info"></i> Conceptual connection to <strong>SAP ABAP RAP Backend</strong>
+                    <div style="font-size:0.7rem; font-weight:600; margin-top:0.25rem;"><i class="fa-solid fa-server"></i> Backend Powered by SAP ABAP RAP & OData Services</div>
+                </div>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form" onsubmit="event.preventDefault(); handleLogin();">
+                <div class="form-group">
+                    <label for="username">SAP Username</label>
+                    <div class="login-input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="username" placeholder="Enter username..." required value="admin">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="login-input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" placeholder="Enter password..." required value="sap123">
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fa-solid fa-right-to-bracket"></i> Sign In to System
+                </button>
+
+                <p style="margin-top: 1.25rem; font-size: 0.85rem; color: var(--fiori-text-secondary);">
+                    New to system? <a href="#" onclick="toggleLoginRegister(true)" style="color: var(--fiori-primary); font-weight: 600;">Create an Account</a>
+                </p>
+            </form>
+
+            <!-- Register Account Form (Task 16 Role based register) -->
+            <form id="registerForm" class="login-form" style="display: none;" onsubmit="event.preventDefault(); handleRegister();">
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label for="regFullName">Full Name</label>
+                    <div class="login-input-wrapper">
+                        <i class="fa-solid fa-address-card"></i>
+                        <input type="text" id="regFullName" placeholder="Enter full name..." required>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label for="regUsername">SAP Username</label>
+                    <div class="login-input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="regUsername" placeholder="Create username..." required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label for="regRole">Role Access</label>
+                    <div class="login-input-wrapper">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <select id="regRole" required>
+                            <option value="Customer">Customer (Standard User)</option>
+                            <option value="Admin">System Admin (Manager)</option>
+                            <option value="Delivery">Delivery Agent (Rider)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label for="regPassword">Password</label>
+                    <div class="login-input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="regPassword" placeholder="Create password..." required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <div class="login-input-wrapper">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <input type="password" id="regConfirmPassword" placeholder="Re-enter password..." required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn" style="background-color: var(--fiori-success);">
+                    <i class="fa-solid fa-user-plus"></i> Register & Create Account
+                </button>
+
+                <p style="margin-top: 1.25rem; font-size: 0.85rem; color: var(--fiori-text-secondary);">
+                    Already have an account? <a href="#" onclick="toggleLoginRegister(false)" style="color: var(--fiori-primary); font-weight: 600;">Sign In</a>
+                </p>
+            </form>
+            
+            <div class="login-footer">
+                <p>Default credentials: <strong>admin</strong> / <strong>sap123</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         2. MAIN ENTERPRISE APP WINDOW
+         ========================================== -->
+    <div id="appContainer" class="main-app-container" style="display: none;">
+        
+        <!-- SIDE NAVIGATION BAR -->
+        <aside id="sidebar" class="fiori-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span>ShareBite</span>
+                </div>
+                <button id="sidebarToggle" class="sidebar-toggle-btn" title="Toggle Navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-item active" onclick="switchView('dashboard')" id="nav-dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchView('menu')" id="nav-menu">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span>Food Menu</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchView('customers')" id="nav-customers">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Customers</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchView('orders')" id="nav-orders">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Orders</span>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer" onclick="handleLogout()" title="Log out from system">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256" alt="User avatar">
+                <div class="sidebar-footer-info">
+                    <h4>A. Yeshaswini</h4>
+                    <p style="font-size:0.75rem; color:var(--fiori-primary); margin-bottom:0.15rem; font-weight:600;"><i class="fa-solid fa-server"></i> SAP ABAP RAP Powered</p>
+                    <p><i class="fa-solid fa-right-from-bracket"></i> Sign Out</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN WORKSPACE -->
+        <main class="main-workspace">
+            
+            <!-- SAP SHELL BAR -->
+            <header class="fiori-shellbar">
+                <div class="shellbar-left">
+                    <div class="shellbar-title" id="pageMainTitle">Enterprise Dashboard</div>
+                    <div class="shellbar-breadcrumb">
+                        <span>ShareBite</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                        <span id="breadcrumbActivePage">Dashboard</span>
+                    </div>
+                </div>
+                
+                <div class="shellbar-search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="globalSearch" placeholder="Search menu, customers or orders..." oninput="handleGlobalSearch(this.value)">
+                </div>
+                
+                <div class="shellbar-right">
+                    <!-- Light / Dark Mode Toggle Switch (Task 12) -->
+                    <div class="theme-switch-wrapper" title="Toggle Light/Dark Horizon Theme">
+                        <i class="fa-solid fa-sun" style="font-size:0.85rem; color:var(--fiori-text-secondary)"></i>
+                        <label class="theme-switch" for="themeCheckbox">
+                            <input type="checkbox" id="themeCheckbox" onchange="toggleDarkLightMode(this.checked)">
+                            <span class="theme-slider"></span>
+                        </label>
+                        <i class="fa-solid fa-moon" style="font-size:0.85rem; color:var(--fiori-text-secondary)"></i>
+                    </div>
+
+                    <span id="liveClock" class="shellbar-date">2026-05-28</span>
+                    
+                    <button class="shellbar-icon-btn" title="System Notifications">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="badge-dot"></span>
+                    </button>
+                    
+                    <button class="shellbar-icon-btn" onclick="handleLogout()" title="Log Out">
+                        <i class="fa-solid fa-power-off"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- SCROLLABLE PAGE WORKSPACE -->
+            <div class="content-workspace">
+
+                <!-- -----------------------------------------
+                     PAGE 1: DASHBOARD PAGE
+                     ----------------------------------------- -->
+                <div id="dashboardPage" class="app-view active">
+                    <div class="page-title-block">
+                        <h1>Analytical Overview</h1>
+                        <p style="font-size: 0.85rem; color: var(--fiori-primary); font-weight: 600; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                            <i class="fa-solid fa-server"></i> Backend Powered by SAP ABAP RAP & OData Services
+                        </p>
+                    </div>
+
+                    <!-- KPI CARDS (Light theme default variables, upgraded Task 8) -->
+                    <div class="kpi-cards-grid">
+                        <div class="kpi-card kpi-orders">
+                            <div class="kpi-info">
+                                <h3>Total Orders</h3>
+                                <div class="kpi-value" id="kpi-total-orders">0</div>
+                            </div>
+                            <div class="kpi-icon-wrapper">
+                                <i class="fa-solid fa-shopping-bag"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-card kpi-customers">
+                            <div class="kpi-info">
+                                <h3>Total Customers</h3>
+                                <div class="kpi-value" id="kpi-total-customers">0</div>
+                            </div>
+                            <div class="kpi-icon-wrapper">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-card kpi-foods">
+                            <div class="kpi-info">
+                                <h3>Available Foods</h3>
+                                <div class="kpi-value" id="kpi-total-foods">0</div>
+                            </div>
+                            <div class="kpi-icon-wrapper">
+                                <i class="fa-solid fa-utensils"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-card kpi-revenue">
+                            <div class="kpi-info">
+                                <h3>Total Revenue</h3>
+                                <div class="kpi-value" id="kpi-total-revenue">₹0</div>
+                            </div>
+                            <div class="kpi-icon-wrapper">
+                                <i class="fa-solid fa-indian-rupee-sign"></i>
+                            </div>
+                        </div>
+                        <!-- Upgraded items -->
+                        <div class="kpi-card kpi-delivered">
+                            <div class="kpi-info">
+                                <h3>Delivered Orders</h3>
+                                <div class="kpi-value" id="kpi-delivered-orders">0</div>
+                            </div>
+                            <div class="kpi-icon-wrapper">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-card kpi-pending">
+                            <div class="kpi-info">
+                                <h3>Pending Orders</h3>
+                                <div class="kpi-value" id="kpi-pending-orders">0</div>
+                            </div>
+                            <div class="kpi-icon-wrapper">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-card kpi-cancelled">
+                            <div class="kpi-info">
+                                <h3>Cancelled Orders</h3>
+                                <div class="kpi-value" id="kpi-cancelled-orders">0</div>
+                            </div>
+                            <div class="kpi-icon-wrapper">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-card kpi-revenue">
+                            <div class="kpi-info">
+                                <h3>Today's Earning</h3>
+                                <div class="kpi-value" id="kpi-today-revenue">₹0</div>
+                            </div>
+                            <div class="kpi-icon-wrapper">
+                                <i class="fa-solid fa-calendar-day"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CHARTS & SUMMARY GRID -->
+                    <div class="dashboard-grid-two-col">
+                        <div class="dashboard-panel">
+                            <div class="panel-header">
+                                <h2><i class="fa-solid fa-chart-column"></i> Revenue Trend (Last 7 Days)</h2>
+                                <span class="badge status-delivered">OData Active Sync</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="ordersChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-panel">
+                            <div class="panel-header">
+                                <h2><i class="fa-solid fa-pizza-slice"></i> Food Distribution</h2>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoriesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RECENT TRANSACTIONS (ZORDERS TABLE SUMMARY) -->
+                    <div class="dashboard-grid-one-col dashboard-panel">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-clock-rotate-left"></i> Recent Orders Overview</h2>
+                            <button class="btn-primary" onclick="switchView('orders')" style="padding: 0.35rem 0.85rem; font-size: 0.75rem;">
+                                Manage Orders <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="fiori-table-wrapper" style="max-height: 300px; overflow-y: auto;">
+                            <table class="fiori-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer ID</th>
+                                        <th>Food Items</th>
+                                        <th>Total Amount</th>
+                                        <th>Currency</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardRecentOrdersTableBody">
+                                    <!-- Dynamic rows from JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     PAGE 2: FOOD MENU PAGE (ZFOOD_MENU)
+                     ----------------------------------------- -->
+                <div id="menuPage" class="app-view">
+                    <div class="page-title-block">
+                        <h1>Food Menu Registry</h1>
+                        <p>Displaying and managing active items inside the core food menu database view.</p>
+                    </div>
+
+                    <!-- CATEGORY TABS -->
+                    <div class="menu-controls">
+                        <div class="menu-category-tabs" id="menuCategoryTabs">
+                            <button class="category-tab active" onclick="filterMenu('All')">All Categories</button>
+                            <button class="category-tab" onclick="filterMenu('Fast Food')">Fast Food</button>
+                            <button class="category-tab" onclick="filterMenu('Snacks')">Snacks</button>
+                            <button class="category-tab" onclick="filterMenu('Main Course')">Main Course</button>
+                        </div>
+                        <div class="flex gap-1 align-center">
+                            <!-- Sorting selector & JSON exporter (Task 15 / 18) -->
+                            <select id="menuSorter" class="filter-input" style="width: 140px; background:#fff" onchange="handleMenuSort(this.value)">
+                                <option value="default">Sort by ID</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="alpha">Alphabetical</option>
+                            </select>
+                            <button class="btn-secondary" onclick="triggerFoodMenuJsonDownload()" title="Export JSON Model">
+                                <i class="fa-solid fa-file-export"></i> Export JSON
+                            </button>
+                            <button class="btn-primary" onclick="openAddFoodModal()">
+                                <i class="fa-solid fa-plus"></i> Add Menu Item
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FOOD CARDS GRID -->
+                    <div class="menu-grid" id="foodMenuGrid">
+                        <!-- Dynamic food item cards from JS -->
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     PAGE 3: CUSTOMERS PAGE (ZCUSTOMERSS)
+                     ----------------------------------------- -->
+                <div id="customersPage" class="app-view">
+                    <div class="page-title-block">
+                        <h1>Customer Records</h1>
+                        <p>Enterprise customer profile registry linked to OData transaction services.</p>
+                    </div>
+
+                    <!-- FILTER BAR -->
+                    <div class="fiori-filter-bar">
+                        <div class="filter-group">
+                            <label for="customerSearch">Customer Details</label>
+                            <input type="text" id="customerSearch" class="filter-input" placeholder="Search by name, address..." oninput="handleCustomerFilter()">
+                        </div>
+                        <div class="filter-actions">
+                            <button class="btn-secondary" onclick="triggerCustomersCSVDownload()" title="Export ZCUSTOMERSS to CSV">
+                                <i class="fa-solid fa-file-csv"></i> Export CSV
+                            </button>
+                            <button class="btn-primary" onclick="openAddCustomerModal()">
+                                <i class="fa-solid fa-user-plus"></i> Add Customer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CUSTOMERS TABLE -->
+                    <div class="fiori-table-wrapper">
+                        <table class="fiori-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer ID</th>
+                                    <th>Full Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Address</th>
+                                    <th style="width: 150px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody">
+                                <!-- Dynamic rows from JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     PAGE 4: ORDERS PAGE (ZORDERS)
+                     ----------------------------------------- -->
+                <div id="ordersPage" class="app-view">
+                    <div class="page-title-block">
+                        <h1>Orders Management</h1>
+                        <p>Create, inspect, filter, and process food transaction receipts.</p>
+                    </div>
+
+                    <!-- SMART FILTER BAR -->
+                    <div class="fiori-filter-bar">
+                        <div class="filter-group">
+                            <label for="orderSearch">Search Orders</label>
+                            <input type="text" id="orderSearch" class="filter-input" placeholder="Search by Order ID, customer name..." oninput="handleOrdersFilter()">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="orderStatusFilter">Status Filter</label>
+                            <select id="orderStatusFilter" class="filter-input" onchange="handleOrdersFilter()">
+                                <option value="All">All Statuses</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Preparing">Preparing</option>
+                                <option value="Out for Delivery">Out for Delivery</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="orderSortSelector">Sort By</label>
+                            <select id="orderSortSelector" class="filter-input" onchange="handleOrdersSort(this.value)">
+                                <option value="latest">Latest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="value-high">Order Value: High-Low</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button class="btn-secondary" onclick="triggerOrdersCSVDownload()" title="Export ZORDERS to CSV">
+                                <i class="fa-solid fa-file-csv"></i> Export CSV
+                            </button>
+                            <button class="btn-primary" onclick="openCreateOrderModal()">
+                                <i class="fa-solid fa-cart-plus"></i> Create Order Receipt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ORDERS TABLE -->
+                    <div class="fiori-table-wrapper">
+                        <table class="fiori-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer ID / Name</th>
+                                    <th>Food Item (Food Menu)</th>
+                                    <th>Qty</th>
+                                    <th>Total Amount</th>
+                                    <th>Currency</th>
+                                    <th>Status</th>
+                                    <th style="width: 250px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody">
+                                <!-- Dynamic rows from JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Active Order Timeline Progress Tracker Card (Item 14 timeline tracker) -->
+                    <div class="timeline-card" style="margin-top: 1.5rem;">
+                        <div class="timeline-header">
+                            <h3 id="timelineActiveOrderLabel">Order timeline tracker: No Order Selected</h3>
+                            <span class="badge status-yes">SAP CDS Status</span>
+                        </div>
+                        <div class="timeline-tracker">
+                            <div id="timelineProgressBar" class="timeline-progress-bar"></div>
+                            
+                            <div class="timeline-step">
+                                <div class="timeline-step-icon"><i class="fa-solid fa-circle-plus"></i></div>
+                                <div class="timeline-step-label">Order Created</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-step-icon"><i class="fa-solid fa-kitchen-set"></i></div>
+                                <div class="timeline-step-label">Preparing</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-step-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                                <div class="timeline-step-label">Out for Delivery</div>
+                            </div>
+                            <div class="timeline-step">
+                                <div class="timeline-step-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                <div class="timeline-step-label">Delivered</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     PAGE 5: INVOICE PAGE
+                     ----------------------------------------- -->
+                <div id="invoicePage" class="app-view">
+                    <div class="invoice-actions-bar">
+                        <button class="btn-secondary" onclick="switchView('orders')">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Orders
+                        </button>
+                        <div class="flex gap-1">
+                            <button class="btn-primary" onclick="window.print()">
+                                <i class="fa-solid fa-print"></i> Print Invoice
+                            </button>
+                            <button class="btn-secondary" onclick="triggerJsonDownload()" title="Export OData Structure">
+                                <i class="fa-solid fa-download"></i> Export JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="invoice-page-container">
+                        <div class="invoice-sheet" id="invoiceContentArea">
+                            <!-- Dynamic Printable Content from JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ==========================================
+         3. MODALS CONTAINER (CRUD FORMS)
+         ========================================== -->
+         
+    <!-- CUSTOMER ADD/EDIT MODAL -->
+    <div id="customerModal" class="modal-overlay" onclick="helpers.closeModal('customerModal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="customerModalTitle">Add New Customer Record</h3>
+                <button class="btn-close-modal" onclick="helpers.closeModal('customerModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="customerForm" onsubmit="event.preventDefault(); handleCustomerSubmit();">
+                <div class="modal-body">
+                    <input type="hidden" id="customerFormId">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="custName" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Customer Name</label>
+                        <input type="text" id="custName" class="filter-input" style="background:#fff" placeholder="e.g. Rahul Kumar" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="custPhone" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Phone Number</label>
+                        <input type="tel" id="custPhone" class="filter-input" style="background:#fff" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Ten digits phone number" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="custAddress" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Delivery Address</label>
+                        <textarea id="custAddress" class="filter-input" style="background:#fff; height:80px; resize:none;" placeholder="e.g. Hyderabad, Telangana" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="helpers.closeModal('customerModal')">Cancel</button>
+                    <button type="submit" class="btn-primary" id="customerSubmitButton">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOD MENU ADD/EDIT MODAL -->
+    <div id="foodModal" class="modal-overlay" onclick="helpers.closeModal('foodModal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="foodModalTitle">Register Food Menu Item</h3>
+                <button class="btn-close-modal" onclick="helpers.closeModal('foodModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="foodForm" onsubmit="event.preventDefault(); handleFoodSubmit();">
+                <div class="modal-body">
+                    <input type="hidden" id="foodFormId">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="foodName" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Food Name</label>
+                        <input type="text" id="foodName" class="filter-input" style="background:#fff" placeholder="e.g. Garlic Bread" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="foodCategory" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Category</label>
+                        <select id="foodCategory" class="filter-input" style="background:#fff" required>
+                            <option value="Fast Food">Fast Food</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Main Course">Main Course</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="foodPrice" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Price (INR)</label>
+                        <input type="number" id="foodPrice" class="filter-input" style="background:#fff" placeholder="e.g. 150" min="1" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="foodAvailable" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Available Status</label>
+                        <select id="foodAvailable" class="filter-input" style="background:#fff" required>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <!-- Custom local image Base64 file uploader (Task 13 uploader preview) -->
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Food Item Picture</label>
+                        <div class="image-upload-preview-container" onclick="document.getElementById('foodImageFileInput').click()">
+                            <img id="foodImagePreview" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=300" alt="Preview Image">
+                            <div style="z-index: 2; background: rgba(0,0,0,0.5); width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.75rem; font-weight:600; flex-direction:column; gap:0.25rem;">
+                                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.25rem;"></i>
+                                Click to Upload Image
+                            </div>
+                        </div>
+                        <input type="file" id="foodImageFileInput" accept="image/*" style="display: none;" onchange="handleFoodImageUpload(event)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="helpers.closeModal('foodModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Food Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CREATE ORDER MODAL -->
+    <div id="orderModal" class="modal-overlay" onclick="helpers.closeModal('orderModal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Create New Order Transaction</h3>
+                <button class="btn-close-modal" onclick="helpers.closeModal('orderModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="orderForm" onsubmit="event.preventDefault(); handleOrderSubmit();">
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label for="orderCustomerSelect" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Select Customer (Customers)</label>
+                        <select id="orderCustomerSelect" class="filter-input" style="background:#fff" required>
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label for="orderFoodSelect" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Select Food Item (Food Menu)</label>
+                        <select id="orderFoodSelect" class="filter-input" style="background:#fff" onchange="calculateOrderAmount()" required>
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    
+                    <div class="flex gap-2" style="margin-bottom: 1.25rem;">
+                        <div class="form-group" style="flex:1;">
+                            <label for="orderQuantity" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Quantity</label>
+                            <input type="number" id="orderQuantity" class="filter-input" style="background:#fff" min="1" max="100" value="1" oninput="calculateOrderAmount()" required>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Item Price</label>
+                            <div id="orderFoodPriceLabel" style="padding:0.5rem; font-weight:600; font-size:0.9rem; color:var(--fiori-text-secondary)">₹0</div>
+                        </div>
+                    </div>
+
+                    <div style="background-color: var(--fiori-bg); border: 1px dashed var(--fiori-border-dark); border-radius: var(--fiori-radius); padding: 1rem; text-align: center;">
+                        <span style="font-size: 0.8rem; color: var(--fiori-text-secondary); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 0.25rem;">Estimated Grand Total</span>
+                        <span id="orderGrandTotalLabel" style="font-family: var(--fiori-font-display); font-size: 1.6rem; font-weight: 700; color: var(--fiori-primary);">₹0.00</span>
+                        <input type="hidden" id="orderTotalAmountField">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="helpers.closeModal('orderModal')">Cancel</button>
+                    <button type="submit" class="btn-primary"><i class="fa-solid fa-check"></i> Post Order (Orders)</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem;"></div>
+
+    <!-- ==========================================
+         4. MODULAR SCRIPTS LOADER & STATE SYSTEM
+         ========================================== -->
+    
+    <!-- Dynamic global state synchronization (avoids cross-origin ES6 module restrictions on direct file:/// loads) -->
+    <script>
+        let state = {
+            credentials: [],
+            menu: [],
+            customers: [],
+            orders: [],
+            activeView: 'dashboard',
+            customerMap: new Map(),
+            menuMap: new Map(),
+            charts: {}
+        };
+
+        // Table localStorage sync
+        function syncDatabase(tableKey) {
+            if (tableKey === 'ZFOOD_MENU') {
+                localStorage.setItem('ZFOOD_MENU', JSON.stringify(state.menu));
+            } else if (tableKey === 'ZCUSTOMERSS') {
+                localStorage.setItem('ZCUSTOMERSS', JSON.stringify(state.customers));
+            } else if (tableKey === 'ZORDERS') {
+                localStorage.setItem('ZORDERS', JSON.stringify(state.orders));
+            }
+            updateKPIs();
+            updateCharts();
+        }
+    </script>
+    
+    <!-- Sequential controllers and helpers -->
+    <script src="utils/helpers.js"></script>
+    <script src="controllers/auth.js"></script>
+    <script src="controllers/dashboard.js"></script>
+    <script src="controllers/menu.js"></script>
+    <script src="controllers/customers.js"></script>
+    <script src="controllers/orders.js"></script>
+    <script src="controllers/invoice.js"></script>
+
+    <!-- App bootstrapping initialization -->
+    <script>
+        const INITIAL_FOOD_MENU = [
+            { "FOOD_ID": "F101", "FOOD_NAME": "Pizza", "CATEGORY": "Fast Food", "PRICE": 250, "AVAILABLE": "Yes", "IMAGE": "assets/pizza.png" },
+            { "FOOD_ID": "F102", "FOOD_NAME": "Burger", "CATEGORY": "Snacks", "PRICE": 180, "AVAILABLE": "Yes", "IMAGE": "assets/burger.png" },
+            { "FOOD_ID": "F103", "FOOD_NAME": "Biryani", "CATEGORY": "Main Course", "PRICE": 320, "AVAILABLE": "Yes", "IMAGE": "assets/biryani.png" },
+            { "FOOD_ID": "F104", "FOOD_NAME": "Fries", "CATEGORY": "Snacks", "PRICE": 120, "AVAILABLE": "Yes", "IMAGE": "assets/fries.png" }
+        ];
+
+        const INITIAL_CUSTOMERS = [
+            { "CUSTOMER_ID": "C101", "NAME": "Rahul", "PHONE_NUMBER": "9876543210", "ADDRESS": "Hyderabad" },
+            { "CUSTOMER_ID": "C102", "NAME": "Sneha", "PHONE_NUMBER": "9123456780", "ADDRESS": "Bangalore" }
+        ];
+
+        const INITIAL_ORDERS = [
+            { "ORDER_ID": "O1001", "CUTSOMER_ID": "C101", "FOOD_ID": "F101", "QUANTITY": 2, "TOTAL_AMOUNT": 500, "WAERS": "INR", "STATUS": "Delivered", "DATE": "2026-05-24" },
+            { "ORDER_ID": "O1002", "CUTSOMER_ID": "C102", "FOOD_ID": "F102", "QUANTITY": 1, "TOTAL_AMOUNT": 180, "WAERS": "INR", "STATUS": "Pending", "DATE": "2026-05-26" }
+        ];
+
+        // Hydrate database
+        function initDatabase() {
+            if (!localStorage.getItem('ZUSERS_CREDENTIALS')) {
+                localStorage.setItem('ZUSERS_CREDENTIALS', JSON.stringify(INITIAL_CREDENTIALS));
+            }
+            if (!localStorage.getItem('ZFOOD_MENU') || JSON.parse(localStorage.getItem('ZFOOD_MENU')).length < INITIAL_FOOD_MENU.length) {
+                localStorage.setItem('ZFOOD_MENU', JSON.stringify(INITIAL_FOOD_MENU));
+            }
+            if (!localStorage.getItem('ZCUSTOMERSS')) {
+                localStorage.setItem('ZCUSTOMERSS', JSON.stringify(INITIAL_CUSTOMERS));
+            }
+            if (!localStorage.getItem('ZORDERS')) {
+                localStorage.setItem('ZORDERS', JSON.stringify(INITIAL_ORDERS));
+            }
+
+            state.credentials = JSON.parse(localStorage.getItem('ZUSERS_CREDENTIALS'));
+            state.menu = JSON.parse(localStorage.getItem('ZFOOD_MENU'));
+            state.customers = JSON.parse(localStorage.getItem('ZCUSTOMERSS'));
+            state.orders = JSON.parse(localStorage.getItem('ZORDERS'));
+        }
+
+        // Initialize state lookups and views
+        function initAppView() {
+            initSidebarInteractivity();
+            updateKPIs();
+            
+            // Prevent Multiple Chart Re-creations (Task 2)
+            if (!state.charts.trend) {
+                initCharts();
+            } else {
+                updateCharts();
+            }
+
+            renderDashboard();
+            
+            const activeUser = sessionStorage.getItem('sharebite_session') || 'A. Yeshaswini';
+            const userHeader = document.querySelector('.sidebar-footer-info h4');
+            if (userHeader) userHeader.textContent = activeUser;
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('liveClock').textContent = new Date().toLocaleDateString('en-US', options);
+        }
+
+        // Global Route SPA Switcher (transition wrappers Task 9)
+        async function switchView(viewId) {
+            await helpers.showSpinner(true, 250);
+            state.activeView = viewId;
+            
+            const views = document.querySelectorAll('.app-view');
+            views.forEach(v => v.classList.remove('active'));
+            
+            const activePanel = document.getElementById(`${viewId}Page`);
+            if (activePanel) activePanel.classList.add('active');
+
+            const navItems = document.querySelectorAll('.sidebar-nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const activeNavItem = document.getElementById(`nav-${viewId}`);
+            if (activeNavItem) activeNavItem.classList.add('active');
+
+            const mainTitle = document.getElementById('pageMainTitle');
+            const breadcrumbActive = document.getElementById('breadcrumbActivePage');
+            
+            let label = 'Dashboard';
+            if (viewId === 'menu') label = 'Food Menu';
+            if (viewId === 'customers') label = 'Customers';
+            if (viewId === 'orders') label = 'Orders';
+            if (viewId === 'invoice') label = 'FOOD ORDER INVOICE';
+            
+            mainTitle.textContent = label;
+            breadcrumbActive.textContent = label;
+
+            if (viewId === 'dashboard') {
+                renderDashboard();
+            } else if (viewId === 'menu') {
+                renderFoodMenu();
+            } else if (viewId === 'customers') {
+                renderCustomers();
+            } else if (viewId === 'orders') {
+                renderOrders();
+            }
+
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+            await helpers.showSpinner(false);
+        }
+
+        // Dark/Light Mode state loader (Task 12)
+        function toggleDarkLightMode(dark) {
+            if (dark) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('sharebite_theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('sharebite_theme', 'light');
+            }
+        }
+
+        function loadSavedTheme() {
+            const saved = localStorage.getItem('sharebite_theme');
+            const checkbox = document.getElementById('themeCheckbox');
+            if (saved === 'dark') {
+                document.body.classList.add('dark-theme');
+                if (checkbox) checkbox.checked = true;
+            } else {
+                document.body.classList.remove('dark-theme');
+                if (checkbox) checkbox.checked = false;
+            }
+        }
+
+        // Sidebar collapsible drawer toggler
+        function initSidebarInteractivity() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            if (sidebar && toggleBtn) {
+                toggleBtn.onclick = () => sidebar.classList.toggle('collapsed');
+            }
+            if (window.innerWidth <= 1024 && sidebar) {
+                sidebar.classList.add('collapsed');
+            }
+        }
+
+        // Global Search Router
+        function handleGlobalSearch(query) {
+            if (!query) {
+                renderDashboard();
+                renderFoodMenu();
+                renderCustomers();
+                renderOrders();
+                return;
+            }
+
+            if (state.activeView === 'menu') {
+                activeCategoryFilter = 'All';
+                const grid = document.getElementById('foodMenuGrid');
+                grid.innerHTML = '';
+                const items = state.menu.filter(f => 
+                    f.FOOD_NAME.toLowerCase().includes(query.toLowerCase()) || 
+                    f.FOOD_ID.toLowerCase().includes(query.toLowerCase()) || 
+                    f.CATEGORY.toLowerCase().includes(query.toLowerCase())
+                );
+                items.forEach(f => {
+                    const card = document.createElement('div');
+                    card.className = 'menu-card';
+                    card.innerHTML = `
+                        <div class="menu-card-img-wrapper"><img src="${f.IMAGE}" alt="${f.FOOD_NAME}"><div class="menu-card-badge">${f.FOOD_ID}</div></div>
+                        <div class="menu-card-content"><div class="menu-card-header"><h3 class="menu-card-title">${f.FOOD_NAME}</h3><span class="menu-card-price">₹${f.PRICE}</span></div><div class="menu-card-category">${f.CATEGORY}</div></div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } else if (state.activeView === 'customers') {
+                document.getElementById('customerSearch').value = query;
+                handleCustomerFilter();
+            } else if (state.activeView === 'orders') {
+                document.getElementById('orderSearch').value = query;
+                handleOrdersFilter();
+            }
+        }
+
+        // Document Bootstrapper
+        window.addEventListener('DOMContentLoaded', () => {
+            initDatabase();
+            loadSavedTheme();
+        });
+    </script>
+</body>
+</html>

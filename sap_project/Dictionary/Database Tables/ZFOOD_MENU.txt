@@ -1,0 +1,17 @@
+@EndUserText.label : 'Zood menu  details'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table zfood_menu {
+
+  key mandt   : mandt not null;
+  key food_id : zde_foodid not null;
+  food_name   : zde_foodname;
+  category    : zde_category;
+  @Semantics.amount.currencyCode : 'zfood_menu.waers'
+  price       : zde_pricee;
+  waers       : waers;
+  available   : zde_available;
+
+}

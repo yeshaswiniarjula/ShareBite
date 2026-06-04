@@ -1,0 +1,21 @@
+@EndUserText.label : 'orders of customers'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table zorders {
+
+  key mandt    : mandt not null;
+  key order_id : zde_orderid not null;
+  @AbapCatalog.foreignKey.label : 'foreign key for customers tables'
+  @AbapCatalog.foreignKey.screenCheck : true
+  cutsomer_id  : zde_customerid
+    with foreign key zcustomerss
+      where mandt = zorders.mandt
+        and customer_id = zorders.cutsomer_id;
+  @Semantics.amount.currencyCode : 'zorders.waers'
+  total_amount : zde_totalamount;
+  waers        : waers;
+  status       : zde_status;
+
+}

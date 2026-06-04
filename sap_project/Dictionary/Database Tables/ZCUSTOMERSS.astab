@@ -1,0 +1,14 @@
+@EndUserText.label : 'customer details'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table zcustomerss {
+
+  key mandt       : mandt not null;
+  key customer_id : zde_customerid not null;
+  name            : zde_namee;
+  phone_number    : zde_phoneee;
+  address         : zde_addres;
+
+}

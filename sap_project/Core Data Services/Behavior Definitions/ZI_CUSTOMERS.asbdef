@@ -1,0 +1,13 @@
+managed implementation in class zbp_i_customers unique;
+
+define behavior for ZI_CUSTOMERS
+persistent table zcustomers
+lock master
+authorization master ( instance )
+{
+  create;
+  update;
+  delete;
+
+  field ( readonly ) customer_id;
+}

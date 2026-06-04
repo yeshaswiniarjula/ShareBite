@@ -1,0 +1,13 @@
+managed implementation in class zbp_i_orders unique;
+
+define behavior for ZI_ORDERS
+persistent table zorders
+lock master
+authorization master ( instance )
+{
+  create;
+  update;
+  delete;
+
+  field ( readonly ) order_id;
+}

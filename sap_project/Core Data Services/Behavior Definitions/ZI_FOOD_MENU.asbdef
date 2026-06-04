@@ -1,0 +1,13 @@
+managed implementation in class zbp_i_food_menu unique;
+
+define behavior for ZI_FOOD_MENU
+persistent table zfood_menu
+lock master
+authorization master ( instance )
+{
+  create;
+  update;
+  delete;
+
+  field ( readonly ) food_id;
+}

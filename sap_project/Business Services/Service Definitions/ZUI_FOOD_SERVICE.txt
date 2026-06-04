@@ -1,0 +1,7 @@
+@EndUserText.label: 'Food Service'
+define service ZUI_FOOD_SERVICE {
+  expose ZC_FOOD_MENU;
+  expose ZC_CUSTOMERS;
+  expose ZC_ORDERS;
+  expose ZC_ORDER_ITEMS;
+}
