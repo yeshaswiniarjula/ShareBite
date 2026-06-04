@@ -152,6 +152,10 @@ The ABAP development elements saved directly from the Eclipse ADT workspace:
 ### 12. Delivery Agent Order Portal
 ![Delivery Agent Portal](screenshots/21_Delivery_Agent_View.png)
 
+### 13. Customer Dashboard View (POV)
+![Customer POV Dashboard](screenshots/22_Customer_POV_Dashboard.png)
+
+
 
 
 
