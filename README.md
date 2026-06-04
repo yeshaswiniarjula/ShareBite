@@ -65,3 +65,29 @@ The ABAP development elements saved directly from the Eclipse ADT workspace:
 4. Copy the code from the file (or the `.txt` equivalent) and paste it into Eclipse.
 5. Activate the CDS views, Behavior Definitions, and Service Definition.
 6. Publish the local OData service binding to start consuming the service!
+
+---
+
+## 📸 SAP System Screenshots
+
+### 1. Eclipse ADT Project Structure
+![Eclipse Project Structure](screenshots/02_Eclipse_Project_Structure.png)
+
+### 2. Core Data Services (CDS Views)
+* **Customers View (`ZI_CUSTOMERS`)**:
+![Customers CDS View](screenshots/03_CDS_View_Customers.png)
+
+* **Food Menu View (`ZI_FOOD_MENU`)**:
+![Food Menu CDS View](screenshots/04_CDS_View_FoodMenu.png)
+
+### 3. Behavior Definitions
+* **Customers Behavior (`ZI_CUSTOMERS`)**:
+![Behavior Definition](screenshots/05_Behavior_Definition.png)
+
+### 4. Service Bindings
+![Service Binding](screenshots/07_Service_Binding.png)
+
+### 5. Dictionary Tables
+* **Customers Table (`ZCUSTOMERSS`) Structure**:
+![Customers Table](screenshots/11_Table_Customers.png)
+
